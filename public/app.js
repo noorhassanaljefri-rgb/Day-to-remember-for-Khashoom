@@ -14,7 +14,7 @@
     label: 'Our Playlist',
     cta: 'Open the playlist',
   };
-  const MUSIC_YT_ID = '';                             // '' = the music is the file audio/music.mp3 (now: Yiruma – River Flows in You); a YouTube video ID here would use YouTube instead
+  const MUSIC_YT_ID = 'DZteznd47B4';                  // the song is this YouTube video (https://youtu.be/DZteznd47B4); '' = use the file audio/music.mp3 instead (it also plays as a backup if YouTube can't)
   /* ==================================================== */
   let D = window.DTR, C = D && D.content;
   const ASSET = Object.assign({ car: 'images/car.webp', carEmpty: 'images/car-empty.webp', balloon: 'images/balloon.webp', balloonEmpty: 'images/balloon-empty.webp', walk: 'images/walk.webp', music: 'audio/music.mp3' }, window.DTR_ASSETS || {});
