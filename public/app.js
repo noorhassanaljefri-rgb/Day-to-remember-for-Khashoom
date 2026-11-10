@@ -15,7 +15,7 @@
     cta: 'Open the playlist',
   };
   const LETTER_HINT = 'الكود مكتوب على اخر هدية'; // small hint under «Something written just for you…» in the golden-star popup ('' = none)
-  const LAST_STOP_NOTE = 'وهذي هي وجهتنا الأخيرة… قلبي، المكان اللي كان لك من البداية، وبيظل مكانك دايمًا.'; // small note under the last stop's title ('' = none)
+  const LAST_STOP_NOTE = 'وهذي هي وجهتنا الأخيرة… قلبي، المكان اللي كان لك من البداية، وحيكون مكانك دايمًا.'; // small note under the last stop's title ('' = none)
   const MUSIC_YT_ID = '';                             // '' = the music is the file audio/music.mp3 (now: Oktyabr – Soul Therapy); a YouTube video ID here (e.g. 'DZteznd47B4') would use YouTube instead
   /* ==================================================== */
   let D = window.DTR, C = D && D.content;
