@@ -14,6 +14,7 @@
     label: 'Our Playlist',
     cta: 'Open the playlist',
   };
+  const LETTER_HINT = 'الكود مكتوب على اخر هدية'; // small hint under «Something written just for you…» in the golden-star popup ('' = none)
   const LAST_STOP_NOTE = 'وهذي هي وجهتنا الأخيرة… قلبي، المكان اللي كان لك من البداية، وبيظل مكانك دايمًا.'; // small note under the last stop's title ('' = none)
   const MUSIC_YT_ID = '';                             // '' = the music is the file audio/music.mp3 (now: Oktyabr – Soul Therapy); a YouTube video ID here (e.g. 'DZteznd47B4') would use YouTube instead
   /* ==================================================== */
@@ -452,7 +453,7 @@
       if (res.error) { err.textContent = 'Connection hiccup — please try again ✦'; return; }
       err.textContent = C.wrongCode; shake(); input.select();
     } }, input, err, btn);
-    openModal([h('div', { class: 'lockring', html: gold ? `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#14304f"/><path fill="#e6cf93" d="M50 18l7 22 23 1-18 14 6 23-18-13-18 13 6-23-18-14 23-1z"/></svg>` : SEAL(`<g transform="translate(34 27) scale(1)">${LOCK.replace('<svg viewBox="0 0 32 38">', '<svg width="32" height="38" viewBox="0 0 32 38">').replace(/id="lg"/, 'id="lg2"').replace(/url\(#lg\)/g, 'url(#lg2)')}</g>`, 'c') }), h('h2', null, withHearts(title)), h('p', { class: 'lead', text: msg }), form], title);
+    openModal([h('div', { class: 'lockring', html: gold ? `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#14304f"/><path fill="#e6cf93" d="M50 18l7 22 23 1-18 14 6 23-18-13-18 13 6-23-18-14 23-1z"/></svg>` : SEAL(`<g transform="translate(34 27) scale(1)">${LOCK.replace('<svg viewBox="0 0 32 38">', '<svg width="32" height="38" viewBox="0 0 32 38">').replace(/id="lg"/, 'id="lg2"').replace(/url\(#lg\)/g, 'url(#lg2)')}</g>`, 'c') }), h('h2', null, withHearts(title)), h('p', { class: 'lead', text: msg }), key === 'letter' && LETTER_HINT ? h('p', { class: 'hint', dir: 'rtl', text: LETTER_HINT, style: { 'font-family': 'var(--ar)', 'font-size': '13.5px', 'line-height': '1.8', color: '#6b7a8c', margin: '-4px 4px 10px' } }) : null, form], title);
     cooldown();
     setTimeout(() => { if (!input.disabled) input.focus(); }, reduced ? 0 : 420);
   }
