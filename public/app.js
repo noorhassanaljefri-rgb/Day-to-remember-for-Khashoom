@@ -14,7 +14,7 @@
     label: 'Our Playlist',
     cta: 'Open the playlist',
   };
-  const MUSIC_YT_ID = 'DZteznd47B4';                  // the song is this YouTube video (https://youtu.be/DZteznd47B4); '' = use the file audio/music.mp3 instead (it also plays as a backup if YouTube can't)
+  const MUSIC_YT_ID = '';                             // '' = the music is the file audio/music.mp3 (now: Oktyabr – Soul Therapy); a YouTube video ID here (e.g. 'DZteznd47B4') would use YouTube instead
   /* ==================================================== */
   let D = window.DTR, C = D && D.content;
   const ASSET = Object.assign({ car: 'images/car.webp', carEmpty: 'images/car-empty.webp', balloon: 'images/balloon.webp', balloonEmpty: 'images/balloon-empty.webp', walk: 'images/walk.webp', music: 'audio/music.mp3' }, window.DTR_ASSETS || {});
@@ -666,9 +666,7 @@
     audio.addEventListener('ended', () => { if (isWav) return; try { audio.currentTime = 0; audio.play().catch(() => {}); } catch {} }); // loop, belt and braces
     const tryPlay = () => { try { const p = audio.play(); if (p && p.catch) p.catch(() => { clearTimeout(cueT); cueT = setTimeout(() => { if (!audible()) showCue(); }, 600); }); } catch {} };
     const useFile = (url) => { audio.src = url; isWav = false; audio.loop = true; audio.muted = muted; if (!pausedByUser) tryPlay(); };
-    fetch(ASSET.music).then((r) => { if (!r.ok) throw new Error('music'); return r.blob(); })
-      .then((b) => useFile(URL.createObjectURL(new Blob([b], { type: 'audio/mpeg' }))))
-      .catch(() => useFile(ASSET.music));
+    useFile(ASSET.music); // streamed straight from the server (it sends byte ranges), so a long song starts playing at once instead of waiting for the whole file
   }
   let aFadeT = null;
   function fadeAudio() {
