@@ -10,7 +10,8 @@ const crypto = require('node:crypto');
 const { DatabaseSync } = require('node:sqlite');
 
 const PORT = Number(process.env.PORT) || 3000;
-const HOST = process.env.HOST || '0.0.0.0';
+// HOST must be an address (e.g. 0.0.0.0); a number like 3000 is a port, not a host, so it is ignored
+const HOST = /^(\d{1,3}\.){3}\d{1,3}$|^[a-z]|^::|^\[/i.test(process.env.HOST || '') ? process.env.HOST : '0.0.0.0';
 const TRUST_PROXY = process.env.TRUST_PROXY === '1';
 const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(__dirname, 'data'));
 const PUBLIC_DIR = path.join(__dirname, 'public');
