@@ -14,6 +14,7 @@
     label: 'Our Playlist',
     cta: 'Open the playlist',
   };
+  const LAST_STOP_NOTE = 'وهذي هي وجهتنا الأخيرة… قلبي، المكان اللي كان لك من البداية، وبيظل مكانك دايمًا.'; // small note under the last stop's title ('' = none)
   const MUSIC_YT_ID = '';                             // '' = the music is the file audio/music.mp3 (now: Oktyabr – Soul Therapy); a YouTube video ID here (e.g. 'DZteznd47B4') would use YouTube instead
   /* ==================================================== */
   let D = window.DTR, C = D && D.content;
@@ -462,6 +463,7 @@
       h('span', { class: 'r-emoji', 'aria-hidden': 'true', text: d.emoji || '✦' }),
       h('div', { class: 'r-kicker', text: `${C.stopLabel} ${pad(d.number || i + 1)}` }),
       h('h2', { class: 'r-title', dir: 'auto' }, withHearts(d.title)),
+      LAST_STOP_NOTE && i === D.stops.length - 1 ? h('p', { class: 'r-small', dir: 'rtl', text: LAST_STOP_NOTE, style: { 'font-family': 'var(--ar)', 'font-size': '13.5px', 'line-height': '1.8', color: '#6b7a8c', margin: '2px 4px 10px' } }) : null,
       d.activity ? h('span', { class: 'r-act', dir: 'auto', text: d.activity }) : null,
       d.description ? h('p', { class: 'r-desc', dir: 'auto', text: d.description }) : null,
       (d.departureNote || d.departureTime) ? h('div', { class: 'note' }, h('span', { class: 'note-k', text: '📌 Note' }), h('span', { class: 'note-t', dir: 'auto', text: d.departureNote || d.departureTime })) : null,
