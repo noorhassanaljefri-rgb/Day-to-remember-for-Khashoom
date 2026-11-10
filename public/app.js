@@ -14,7 +14,7 @@
     label: 'Our Playlist',
     cta: 'Open the playlist',
   };
-  const MUSIC_YT_ID = '7maJOI3QMu0';                  // background music: the YouTube video ID (now: Yiruma – River Flows in You, official)
+  const MUSIC_YT_ID = '';                             // '' = the music is the file audio/music.mp3 (now: Yiruma – River Flows in You); a YouTube video ID here would use YouTube instead
   /* ==================================================== */
   let D = window.DTR, C = D && D.content;
   const ASSET = Object.assign({ car: 'images/car.webp', carEmpty: 'images/car-empty.webp', balloon: 'images/balloon.webp', balloonEmpty: 'images/balloon-empty.webp', walk: 'images/walk.webp', music: 'audio/music.mp3' }, window.DTR_ASSETS || {});
@@ -576,7 +576,7 @@
     history.replaceState({ i: curIdx }, '', '#/invite'); show('invite');
   }
   document.body.insertAdjacentHTML('beforeend', '<svg width="0" height="0" class="sr" aria-hidden="true"><filter id="ink" x="-5%" y="-20%" width="110%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="1.6"/><feGaussianBlur stdDeviation=".35" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></svg>');
-  /* ---------- music: «River Flows in You» through YouTube's official player; the old mp3 is only a backup ---------- */
+  /* ---------- music: «River Flows in You» is the file audio/music.mp3 (MUSIC_YT_ID = ''); YouTube only if an ID is set ---------- */
   let audio = null, muted = LS.get('muted', false), isWav = false;
   let yt = null, ytReady = false, ytFailed = false, wantPlay = false, useFallback = false, pausedByUser = false, startedAt = 0;
   let ytVol = 0, fadeT = null, watchT = null, cueT = null;
@@ -632,7 +632,7 @@
     if (wantPlay && !audible()) fallback(); else if (!wantPlay) showCue();
   }
   function loadYT() {
-    if (!MUSIC_YT_ID) { ytFailed = true; return; }
+    if (!MUSIC_YT_ID) { fileMusic(); return; }
     const box = h('div', { class: 'yt-box', 'aria-hidden': 'true' });
     const ifr = document.createElement('iframe');
     ifr.id = 'yt-music'; ifr.title = 'Background music'; ifr.tabIndex = -1;
@@ -648,6 +648,32 @@
     const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; s.async = true; s.onerror = ytFail;
     document.head.append(s);
     setTimeout(() => { if (!ytReady) ytFail(); }, 15000); // never loaded (offline, blocked…)
+  }
+  function fileMusic() { // the song is the file audio/music.mp3 itself (no YouTube). Loaded as a blob (iPhone-safe even where the host sends no byte ranges); tries to play at once, else the first tap anywhere starts it
+    ytFailed = true; useFallback = true;
+    audio = new Audio(); audio.loop = true; audio.preload = 'auto'; audio.muted = muted;
+    try { audio.volume = 0; } catch {}
+    const wav = new Uint8Array(46); const dv = new DataView(wav.buffer); // a tiny silent clip, so a tap before the song has loaded still unlocks this player
+    [[0, 0x52494646], [8, 0x57415645], [12, 0x666d7420], [36, 0x64617461]].forEach(([o, v]) => dv.setUint32(o, v));
+    dv.setUint32(4, 38, true); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, 8000, true); dv.setUint32(28, 16000, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); dv.setUint32(40, 2, true);
+    try { audio.src = URL.createObjectURL(new Blob([wav], { type: 'audio/wav' })); isWav = true; } catch {}
+    audio.addEventListener('playing', () => {
+      if (pausedByUser) { try { audio.pause(); } catch {} return; }
+      if (isWav) return;
+      if (!wantPlay) { wantPlay = true; muteBtn.hidden = false; paintMute(); }
+      hideCue(); fadeAudio();
+    });
+    audio.addEventListener('ended', () => { if (isWav) return; try { audio.currentTime = 0; audio.play().catch(() => {}); } catch {} }); // loop, belt and braces
+    const tryPlay = () => { try { const p = audio.play(); if (p && p.catch) p.catch(() => { clearTimeout(cueT); cueT = setTimeout(() => { if (!audible()) showCue(); }, 600); }); } catch {} };
+    const useFile = (url) => { audio.src = url; isWav = false; audio.loop = true; audio.muted = muted; if (!pausedByUser) tryPlay(); };
+    fetch(ASSET.music).then((r) => { if (!r.ok) throw new Error('music'); return r.blob(); })
+      .then((b) => useFile(URL.createObjectURL(new Blob([b], { type: 'audio/mpeg' }))))
+      .catch(() => useFile(ASSET.music));
+  }
+  let aFadeT = null;
+  function fadeAudio() {
+    if (aFadeT || !audio || audio.volume >= .6) return;
+    aFadeT = setInterval(() => { let v = .6; try { v = Math.min(.6, audio.volume + .03); audio.volume = v; } catch {} if (v >= .6) { clearInterval(aFadeT); aFadeT = null; } }, 120);
   }
   function unlockAudio() { // inside a tap: wake a backup <audio> with a tiny silent clip so it can take over later
     if (!audio) {

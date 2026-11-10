@@ -872,7 +872,17 @@ function serveStatic(req, res, pathname) {
   if (!file.startsWith(PUBLIC_DIR + path.sep)) throw new HttpError(404, 'Not found');
   const type = MIME[path.extname(file).toLowerCase()];
   if (!type || !fs.existsSync(file) || !fs.statSync(file).isFile()) throw new HttpError(404, 'Not found');
-  res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-cache' });
+  const size = fs.statSync(file).size;
+  const m = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
+  if (m && (m[1] || m[2])) { // byte ranges, so iPhone Safari can play the music file
+    let start = m[1] ? parseInt(m[1], 10) : Math.max(0, size - parseInt(m[2], 10));
+    let end = m[1] && m[2] ? Math.min(parseInt(m[2], 10), size - 1) : size - 1;
+    if (start > end || start >= size) { res.writeHead(416, { 'Content-Range': `bytes */${size}` }); return res.end(); }
+    res.writeHead(206, { 'Content-Type': type, 'Cache-Control': 'no-cache', 'Accept-Ranges': 'bytes', 'Content-Range': `bytes ${start}-${end}/${size}`, 'Content-Length': end - start + 1 });
+    if (req.method === 'HEAD') return res.end();
+    return fs.createReadStream(file, { start, end }).pipe(res);
+  }
+  res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-cache', 'Accept-Ranges': 'bytes', 'Content-Length': size });
   if (req.method === 'HEAD') return res.end();
   fs.createReadStream(file).pipe(res);
 }
