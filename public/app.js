@@ -464,7 +464,7 @@
       h('span', { class: 'r-emoji', 'aria-hidden': 'true', text: d.emoji || '✦' }),
       h('div', { class: 'r-kicker', text: `${C.stopLabel} ${pad(d.number || i + 1)}` }),
       h('h2', { class: 'r-title', dir: 'auto' }, withHearts(d.title)),
-      LAST_STOP_NOTE && i === D.stops.length - 1 ? h('p', { class: 'r-small', dir: 'rtl', text: LAST_STOP_NOTE, style: { 'font-family': 'var(--ar)', 'font-size': '13.5px', 'line-height': '1.8', color: '#6b7a8c', margin: '2px 4px 10px' } }) : null,
+      LAST_STOP_NOTE && i === D.stops.length - 1 ? h('p', { class: 'r-small', dir: 'rtl', style: { 'font-family': 'var(--ar)', 'font-size': '13.5px', 'line-height': '1.8', color: '#6b7a8c', margin: '2px 4px 10px' } }, LAST_STOP_NOTE.split(/(قلبي)/).map((p) => (p === 'قلبي' ? h('strong', { text: p, style: { 'font-size': '16.5px', 'font-weight': '700' } }) : p))) : null,
       d.activity ? h('span', { class: 'r-act', dir: 'auto', text: d.activity }) : null,
       d.description ? h('p', { class: 'r-desc', dir: 'auto', text: d.description }) : null,
       (d.departureNote || d.departureTime) ? h('div', { class: 'note' }, h('span', { class: 'note-k', text: '📌 Note' }), h('span', { class: 'note-t', dir: 'auto', text: d.departureNote || d.departureTime })) : null,
