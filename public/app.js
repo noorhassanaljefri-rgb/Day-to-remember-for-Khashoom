@@ -15,6 +15,7 @@
     cta: 'Open the playlist',
   };
   const LETTER_HINT = 'الكود مكتوب على اخر هدية'; // small hint under «Something written just for you…» in the golden-star popup ('' = none)
+  const FINAL_TITLE = 'One More Scene Together ✦'; // title of the balloon's card (Stop 05)
   const LAST_STOP_NOTE = 'وهذي هي وجهتنا الأخيرة… قلبي، المكان اللي كان لك من البداية، وحيكون مكانك دايمًا.'; // small note under the last stop's title ('' = none)
   const MUSIC_YT_ID = '';                             // '' = the music is the file audio/music.mp3 (now: Oktyabr – Soul Therapy); a YouTube video ID here (e.g. 'DZteznd47B4') would use YouTube instead
   /* ==================================================== */
@@ -405,7 +406,19 @@
     if (driving) return;
     const n = D.stops.length;
     if (unlocked().length < n) { balloonEl.animate && balloonEl.animate([{ transform: 'translate(-50%,-78%) rotate(0)' }, { transform: 'translate(-50%,-78%) rotate(-6deg)' }, { transform: 'translate(-50%,-78%) rotate(5deg)' }, { transform: 'translate(-50%,-78%) rotate(0)' }], { duration: 500 }); return; }
-    drive(n + 1, () => setTimeout(openSky, reduced ? 0 : 300));
+    openFinalCard(); // the balloon's own card (Stop 05); its button drives there and opens the ending
+  }
+  function openFinalCard() {
+    const n = D.stops.length;
+    openModal([
+      h('span', { class: 'r-emoji', 'aria-hidden': 'true', text: '✦' }),
+      h('div', { class: 'r-kicker', text: `${C.stopLabel} ${pad(n + 1)}` }),
+      h('h2', { class: 'r-title', dir: 'auto' }, withHearts(FINAL_TITLE)),
+      LAST_STOP_NOTE ? h('p', { class: 'r-small', dir: 'rtl', style: { 'font-family': 'var(--ar)', 'font-size': '13.5px', 'line-height': '1.8', color: '#6b7a8c', margin: '2px 4px 10px' } }, LAST_STOP_NOTE.split(/(قلبي)/).map((p) => (p === 'قلبي' ? h('strong', { text: p, style: { 'font-size': '16.5px', 'font-weight': '700' } }) : p))) : null,
+      h('div', { class: 'r-actions' },
+        h('button', { class: 'btn', type: 'button', onClick: () => { closeModal(); setTimeout(() => drive(n + 1, () => setTimeout(openSky, reduced ? 0 : 300)), reduced ? 0 : 250); } }, withHearts(C.mapButton)),
+        h('button', { class: 'btn ghost', type: 'button', onClick: () => closeModal(), text: 'Back to the map' })),
+    ], FINAL_TITLE);
   }
 
   /* ---------- codes ---------- */
@@ -464,7 +477,6 @@
       h('span', { class: 'r-emoji', 'aria-hidden': 'true', text: d.emoji || '✦' }),
       h('div', { class: 'r-kicker', text: `${C.stopLabel} ${pad(d.number || i + 1)}` }),
       h('h2', { class: 'r-title', dir: 'auto' }, withHearts(d.title)),
-      LAST_STOP_NOTE && i === D.stops.length - 1 ? h('p', { class: 'r-small', dir: 'rtl', style: { 'font-family': 'var(--ar)', 'font-size': '13.5px', 'line-height': '1.8', color: '#6b7a8c', margin: '2px 4px 10px' } }, LAST_STOP_NOTE.split(/(قلبي)/).map((p) => (p === 'قلبي' ? h('strong', { text: p, style: { 'font-size': '16.5px', 'font-weight': '700' } }) : p))) : null,
       d.activity ? h('span', { class: 'r-act', dir: 'auto', text: d.activity }) : null,
       d.description ? h('p', { class: 'r-desc', dir: 'auto', text: d.description }) : null,
       (d.departureNote || d.departureTime) ? h('div', { class: 'note' }, h('span', { class: 'note-k', text: '📌 Note' }), h('span', { class: 'note-t', dir: 'auto', text: d.departureNote || d.departureTime })) : null,
